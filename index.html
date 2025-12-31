@@ -18,6 +18,7 @@ body{
   font-family:'Poppins',sans-serif;
 }
 
+/* CENTER */
 .center{
   position:absolute;
   inset:0;
@@ -59,6 +60,7 @@ button{
   box-shadow:0 0 25px #ff4ecd;
 }
 
+/* LOVE TEXT */
 #love{
   display:none;
   margin-top:20px;
@@ -76,6 +78,7 @@ button{
   color:#ffe6f6;
 }
 
+/* HEARTS */
 .heart{
   position:absolute;
   font-size:22px;
@@ -88,6 +91,7 @@ button{
   to{transform:translateY(-10vh);opacity:0}
 }
 
+/* SPARKLE */
 .sparkle{
   position:absolute;
   font-size:14px;
@@ -99,6 +103,7 @@ button{
   to{opacity:0;transform:scale(0)}
 }
 
+/* LOVE CARD */
 .card-wrap{
   position:fixed;
   inset:0;
@@ -149,12 +154,14 @@ button{
   text-align:center;
 }
 
+/* FRONT */
 .card-front{
   background:linear-gradient(135deg,#ff4ecd,#ff9de2);
   font-family:'Pacifico',cursive;
   font-size:1.9rem;
 }
 
+/* BACK */
 .card-back{
   background:
     linear-gradient(rgba(255,255,255,0.25),rgba(255,255,255,0.25)),
@@ -166,6 +173,7 @@ button{
   color:#4b002e;
 }
 
+/* CLOSE HEART */
 .close-btn{
   position:absolute;
   top:12px;
@@ -181,6 +189,7 @@ button{
   z-index:10;
 }
 
+/* FIREWORKS */
 canvas{
   position:absolute;
   inset:0;
@@ -213,6 +222,7 @@ canvas{
   <div id="message"></div>
 </div>
 
+<!-- LOVE CARD -->
 <div class="card-wrap" id="cardWrap">
   <div class="card" id="card" onclick="flipCard()">
     <div class="close-btn" onclick="closeCard(event)">💓</div>
@@ -231,10 +241,12 @@ canvas{
   </div>
 </div>
 
+<!-- YOUTUBE MUSIC -->
 <div id="player" style="display:none"></div>
 <script src="https://www.youtube.com/iframe_api"></script>
 
 <script>
+// NAME TYPING
 const nameEl = document.getElementById("name");
 const nameText = "Avneet 💖";
 let ni = 0;
@@ -246,7 +258,106 @@ let ni = 0;
   }
 })();
 
-// rest of your JS remains unchanged
+// FLOATING HEARTS + REOPEN CARD
+setInterval(()=>{
+  const h=document.createElement("div");
+  h.className="heart";
+  h.innerHTML="❤️";
+  h.style.left=Math.random()*100+"vw";
+  h.style.animationDuration=(4+Math.random()*3)+"s";
+  h.onclick=()=>cardWrap.style.display="flex";
+  document.body.appendChild(h);
+  setTimeout(()=>h.remove(),7000);
+},300);
+
+// SPARKLE CURSOR
+document.addEventListener("mousemove",e=>{
+  const s=document.createElement("div");
+  s.className="sparkle";
+  s.innerHTML="✨";
+  s.style.left=e.pageX+"px";
+  s.style.top=e.pageY+"px";
+  document.body.appendChild(s);
+  setTimeout(()=>s.remove(),1000);
+});
+
+// CARD
+function flipCard(){ card.classList.toggle("open"); }
+function closeCard(e){
+  e.stopPropagation();
+  if(!card.classList.contains("open")) return;
+  cardWrap.classList.add("fade-out");
+  setTimeout(()=>{
+    cardWrap.style.display="none";
+    cardWrap.classList.remove("fade-out");
+    card.classList.remove("open");
+  },800);
+}
+
+// MUSIC
+let player,vol=0;
+function onYouTubeIframeAPIReady(){
+  player=new YT.Player('player',{
+    videoId:'jQkjlpOZrlk',
+    playerVars:{autoplay:0,loop:1,playlist:'jQkjlpOZrlk'},
+    events:{onReady:()=>player.setVolume(0)}
+  });
+}
+function fadeInMusic(){
+  const f=setInterval(()=>{
+    if(vol<80){vol+=2;player.setVolume(vol);}
+    else clearInterval(f);
+  },200);
+}
+
+// FIREWORKS
+const canvas=document.getElementById("fireworks");
+const ctx=canvas.getContext("2d");
+canvas.width=innerWidth;
+canvas.height=innerHeight;
+let parts=[];
+function explode(x,y){
+  for(let i=0;i<90;i++){
+    parts.push({x,y,a:Math.random()*6.28,s:Math.random()*5+2,l:90});
+  }
+}
+function animate(){
+  ctx.clearRect(0,0,canvas.width,canvas.height);
+  parts.forEach((p,i)=>{
+    p.x+=Math.cos(p.a)*p.s;
+    p.y+=Math.sin(p.a)*p.s;
+    p.l--;
+    ctx.fillStyle="rgba(255,120,200,0.9)";
+    ctx.fillRect(p.x,p.y,3,3);
+    if(p.l<=0) parts.splice(i,1);
+  });
+  requestAnimationFrame(animate);
+}
+animate();
+
+// START
+function startLove(){
+  player.playVideo();
+  fadeInMusic();
+
+  document.getElementById("love").style.display="block";
+  const msg="💞🌙Some souls arrive quietly and change everything. You did that for me. I hope this new year lets our hearts walk the same path. 🌙💞 ";
+  const box=document.getElementById("message");
+  box.style.display="block";
+  let i=0;
+  const t=setInterval(()=>{
+    box.innerHTML+=msg[i++];
+    if(i>=msg.length) clearInterval(t);
+  },40);
+
+  setTimeout(()=>cardWrap.style.display="flex",8000);
+  setInterval(()=>explode(Math.random()*canvas.width,Math.random()*canvas.height/2),900);
+}
+
+window.onresize=()=>{
+  canvas.width=innerWidth;
+  canvas.height=innerHeight;
+};
 </script>
 
 </body>
